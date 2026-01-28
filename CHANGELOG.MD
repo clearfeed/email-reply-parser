@@ -1,7 +1,7 @@
 Changelog
 =========
 
-## v3.0.0
+## v2.4.0
 
 **BREAKING CHANGE**: Package renamed from `email-reply-parser` to `@clearfeed-ai/email-reply-parser`.
 

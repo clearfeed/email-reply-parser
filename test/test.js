@@ -13,16 +13,6 @@ Nam vel turpis posuere, rhoncus ligula in, venenatis orci. Duis interdum venenat
 Duis ut libero eu lectus consequat consequat ut vel lorem. Vestibulum convallis lectus urna,\n\
 et mollis ligula rutrum quis. Fusce sed odio id arcu varius aliquet nec nec nibh.';
 
-// Global parser instance for resetting state
-const globalParser = new EmailReplyParser();
-
-// Reset regexes before each test to ensure test isolation
-export function setUp(callback) {
-  globalParser.resetQuoteHeaderRegexes();
-  globalParser.resetSignatureRegexes();
-  callback();
-}
-
 function get_email(name) {
   var data = fs.readFileSync(__dirname + "/fixtures/" + name + ".txt", "utf-8");
 

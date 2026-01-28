@@ -39,10 +39,26 @@ class EmailReplyParser {
   }
 
   /**
+   * Add a custom quote header regex
+   */
+  public addQuoteHeaderRegex(regex: RegExp): this {
+    RegexList.addQuoteHeaderRegex(regex);
+    return this;
+  }
+
+  /**
    * Add multiple custom quote header regexes
    */
   public addQuoteHeaderRegexes(regexes: RegExp[]): this {
     RegexList.addQuoteHeaderRegexes(regexes);
+    return this;
+  }
+
+  /**
+   * Add a custom signature regex
+   */
+  public addSignatureRegex(regex: RegExp): this {
+    RegexList.addSignatureRegex(regex);
     return this;
   }
 

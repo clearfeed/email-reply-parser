@@ -1,7 +1,9 @@
 Changelog
 =========
 
-## v2.3.6
+## v3.0.0
+
+**BREAKING CHANGE**: Package renamed from `email-reply-parser` to `@clearfeed-ai/email-reply-parser`.
 
 - Add support for custom header and signature regex patterns at runtime.
 - Add methods: `addQuoteHeaderRegex()`, `addQuoteHeaderRegexes()`, `addSignatureRegex()`, `addSignatureRegexes()`.

@@ -59,7 +59,7 @@ This library is used at [Crisp](https://crisp.chat/) everyday with around 1 mill
 ## Usage
 
 ``` javascript
-import EmailReplyParser from "email-reply-parser";
+import EmailReplyParser from "@clearfeed-ai/email-reply-parser";
 
 const email = new EmailReplyParser().read(MY_EMAIL_STRING);
 
@@ -69,7 +69,7 @@ console.log(email.getVisibleText());
 ### Example
 
 ``` javascript
-import EmailReplyParser from "email-reply-parser";
+import EmailReplyParser from "@clearfeed-ai/email-reply-parser";
 
 const emailContent = `Hi there,
 
@@ -100,7 +100,7 @@ You can add custom header and signature regex patterns at runtime to handle spec
 Quote headers are patterns that indicate quoted or forwarded content (e.g., "On DATE, NAME wrote:").
 
 ``` javascript
-import EmailReplyParser from "email-reply-parser";
+import EmailReplyParser from "@clearfeed-ai/email-reply-parser";
 
 const parser = new EmailReplyParser();
 
@@ -120,7 +120,7 @@ const email = parser.read(emailContent);
 Signature patterns identify signature lines that should be removed (e.g., "Sent from my iPhone", "Best regards").
 
 ``` javascript
-import EmailReplyParser from "email-reply-parser";
+import EmailReplyParser from "@clearfeed-ai/email-reply-parser";
 
 const parser = new EmailReplyParser();
 
@@ -141,7 +141,7 @@ const email = parser.read(emailContent);
 If you need to reset the patterns back to the defaults:
 
 ``` javascript
-import EmailReplyParser from "email-reply-parser";
+import EmailReplyParser from "@clearfeed-ai/email-reply-parser";
 
 const parser = new EmailReplyParser();
 
@@ -160,7 +160,7 @@ parser.resetSignatureRegexes();
 All custom regex methods support method chaining for convenience:
 
 ``` javascript
-import EmailReplyParser from "email-reply-parser";
+import EmailReplyParser from "@clearfeed-ai/email-reply-parser";
 
 const email = new EmailReplyParser()
   .addQuoteHeaderRegexes([/^Forwarded by .+$/m])

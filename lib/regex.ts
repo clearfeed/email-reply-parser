@@ -157,7 +157,7 @@ class RegexList {
    * Add multiple custom quote header regexes
    */
   public addQuoteHeaderRegexes(regexes: RegExp[]): void {
-    regexes.forEach((regex) => this.addQuoteHeaderRegex(regex));
+    this.quoteHeadersRegex.push(...regexes.map((regex) => this.buildSafeRegExp(regex)));
   }
 
   /**
@@ -171,7 +171,7 @@ class RegexList {
    * Add multiple custom signature regexes
    */
   public addSignatureRegexes(regexes: RegExp[]): void {
-    regexes.forEach((regex) => this.addSignatureRegex(regex));
+    this.signatureRegex.push(...regexes.map((regex) => this.buildSafeRegExp(regex)));
   }
 
   /**

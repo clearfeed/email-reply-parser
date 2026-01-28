@@ -1,6 +1,13 @@
 Changelog
 =========
 
+## v2.3.6
+
+- Add support for custom header and signature regex patterns at runtime.
+- Add methods: `addQuoteHeaderRegex()`, `addQuoteHeaderRegexes()`, `addSignatureRegex()`, `addSignatureRegexes()`.
+- Add reset methods: `resetQuoteHeaderRegexes()`, `resetSignatureRegexes()`.
+- Fix issue with custom regexes that don't have capture groups.
+
 ## v2.3.5
 
 - Fix error with require.

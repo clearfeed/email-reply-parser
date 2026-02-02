@@ -168,7 +168,7 @@ const email = new EmailReplyParser()
   .read(emailContent);
 ```
 
-**Note:** Custom patterns are added globally and will affect all subsequent parsing operations. If you're using this library in a multi-tenant environment, consider creating separate parser instances or resetting patterns between operations.
+**Note:** Custom patterns are added globally and will affect all subsequent parsing operations. In multi-tenant environments, reset the patterns between tenants or avoid registering tenant-specific patterns globally.
 
 ## Contributing
 

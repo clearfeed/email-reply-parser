@@ -148,7 +148,11 @@ class EmailParser {
           matchGroup
         ] = matches;
 
-        newText = newText.replace(matchGroup, matchGroup.replace(NEWLINE_REGEX, " "));
+        // Only replace if there's a capture group (for default regexes)
+        // Custom regexes may not have capture groups
+        if (matchGroup) {
+          newText = newText.replace(matchGroup, matchGroup.replace(NEWLINE_REGEX, " "));
+        }
       }
     });
 

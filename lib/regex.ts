@@ -24,13 +24,16 @@ class RegexList {
   quoteHeadersRegex: RegExp[];
   signatureRegex: RegExp[];
 
+  private defaultQuoteHeadersRegex: RegExp[];
+  private defaultSignatureRegex: RegExp[];
+
   /**
    * Constructor
    */
   constructor() {
     this.hasRE2 = this.detectRE2();
 
-    this.quoteHeadersRegex = this.buildSafeRegexes([
+    this.defaultQuoteHeadersRegex = [
       /^-*\s*(On\s.+\s.+\n?wrote:{0,1})\s{0,1}-*$/m, // On DATE, NAME <EMAIL> wrote:
       /^-*\s*(Le\s.+\s.+\n?écrit\s?:{0,1})\s{0,1}-*$/m, // Le DATE, NAME <EMAIL> a écrit :
       /^-*\s*(El\s.+\s.+\n?escribió:{0,1})\s{0,1}-*$/m, // El DATE, NAME <EMAIL> escribió:
@@ -62,9 +65,9 @@ class RegexList {
       /^-{1,12} ?(O|o)prindelig (B|b)esked ?-{1,12}$/i,
       /^-{1,12} ?(M|m)essage d\'origine ?-{1,12}$/i,
       /^-{1,12} ?(U|u)rsprüngliche (N|n)achricht ?-{0,12}$/i
-    ]);
+    ];
 
-    this.signatureRegex = this.buildSafeRegexes([
+    this.defaultSignatureRegex = [
       /^\s*-{2,4}$/, // Separator
       /^\s*_{2,4}$/, // Separator
       /^-- $/, // Separator
@@ -104,7 +107,10 @@ class RegexList {
       // NL
       /^Verzonden vanaf (?:\s*.+)$/, // nl - e.g. Verzonden vanaf (Outlook voor Android<https://aka.ms/12345>|mijn iPad)
       /^Verstuurd vanaf (?:\s*.+)$/  // nl - e.g. Verstuurd vanaf mijn iPad/iPhone
-    ]);
+    ];
+
+    this.quoteHeadersRegex = this.buildSafeRegexes(this.defaultQuoteHeadersRegex);
+    this.signatureRegex = this.buildSafeRegexes(this.defaultSignatureRegex);
   }
 
   /**
@@ -138,6 +144,48 @@ class RegexList {
     } else {
       return new RegExp(regex);
     }
+  }
+
+  /**
+   * Add custom quote header regex
+   */
+  public addQuoteHeaderRegex(regex: RegExp): void {
+    this.quoteHeadersRegex.push(this.buildSafeRegExp(regex));
+  }
+
+  /**
+   * Add multiple custom quote header regexes
+   */
+  public addQuoteHeaderRegexes(regexes: RegExp[]): void {
+    this.quoteHeadersRegex.push(...regexes.map((regex) => this.buildSafeRegExp(regex)));
+  }
+
+  /**
+   * Add custom signature regex
+   */
+  public addSignatureRegex(regex: RegExp): void {
+    this.signatureRegex.push(this.buildSafeRegExp(regex));
+  }
+
+  /**
+   * Add multiple custom signature regexes
+   */
+  public addSignatureRegexes(regexes: RegExp[]): void {
+    this.signatureRegex.push(...regexes.map((regex) => this.buildSafeRegExp(regex)));
+  }
+
+  /**
+   * Reset quote header regexes to default
+   */
+  public resetQuoteHeaderRegexes(): void {
+    this.quoteHeadersRegex = this.buildSafeRegexes(this.defaultQuoteHeadersRegex);
+  }
+
+  /**
+   * Reset signature regexes to default
+   */
+  public resetSignatureRegexes(): void {
+    this.signatureRegex = this.buildSafeRegexes(this.defaultSignatureRegex);
   }
 }
 

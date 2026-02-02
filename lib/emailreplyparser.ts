@@ -11,6 +11,7 @@
 
 // PROJECT: LIB
 import EmailParser from "./parser/emailparser.js";
+import RegexList from "./regex.js";
 
 /**
  * EmailReplyParser
@@ -35,6 +36,54 @@ class EmailReplyParser {
    */
   public parseReplied(text: string) {
     return this.read(text).getQuotedText();
+  }
+
+  /**
+   * Add a custom quote header regex
+   */
+  public addQuoteHeaderRegex(regex: RegExp): this {
+    RegexList.addQuoteHeaderRegex(regex);
+    return this;
+  }
+
+  /**
+   * Add multiple custom quote header regexes
+   */
+  public addQuoteHeaderRegexes(regexes: RegExp[]): this {
+    RegexList.addQuoteHeaderRegexes(regexes);
+    return this;
+  }
+
+  /**
+   * Add a custom signature regex
+   */
+  public addSignatureRegex(regex: RegExp): this {
+    RegexList.addSignatureRegex(regex);
+    return this;
+  }
+
+  /**
+   * Add multiple custom signature regexes
+   */
+  public addSignatureRegexes(regexes: RegExp[]): this {
+    RegexList.addSignatureRegexes(regexes);
+    return this;
+  }
+
+  /**
+   * Reset quote header regexes to default
+   */
+  public resetQuoteHeaderRegexes(): this {
+    RegexList.resetQuoteHeaderRegexes();
+    return this;
+  }
+
+  /**
+   * Reset signature regexes to default
+   */
+  public resetSignatureRegexes(): this {
+    RegexList.resetSignatureRegexes();
+    return this;
   }
 }
 

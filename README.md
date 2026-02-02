@@ -59,7 +59,7 @@ This library is used at [Crisp](https://crisp.chat/) everyday with around 1 mill
 ## Usage
 
 ``` javascript
-import EmailReplyParser from "email-reply-parser";
+import EmailReplyParser from "@clearfeed-ai/email-reply-parser";
 
 const email = new EmailReplyParser().read(MY_EMAIL_STRING);
 
@@ -69,7 +69,7 @@ console.log(email.getVisibleText());
 ### Example
 
 ``` javascript
-import EmailReplyParser from "email-reply-parser";
+import EmailReplyParser from "@clearfeed-ai/email-reply-parser";
 
 const emailContent = `Hi there,
 
@@ -90,6 +90,85 @@ const parser = new EmailReplyParser();
 console.log(parser.parseReply(emailContent));
 // Output: "Hi there,\n\nI appreciate your help with this issue."
 ```
+
+## Custom Regex Patterns
+
+You can add custom header and signature regex patterns at runtime to handle specific email formats that aren't covered by the default patterns.
+
+### Adding Custom Quote Header Patterns
+
+Quote headers are patterns that indicate quoted or forwarded content (e.g., "On DATE, NAME wrote:").
+
+``` javascript
+import EmailReplyParser from "@clearfeed-ai/email-reply-parser";
+
+const parser = new EmailReplyParser();
+
+// Add one or more custom quote header regexes
+parser.addQuoteHeaderRegexes([
+  /^Forwarded by .+ on .+$/m,
+  /^Original message from .+$/m,
+  /^----- Reply from .+ -----$/m
+]);
+
+// Now parse emails with these custom patterns
+const email = parser.read(emailContent);
+```
+
+### Adding Custom Signature Patterns
+
+Signature patterns identify signature lines that should be removed (e.g., "Sent from my iPhone", "Best regards").
+
+``` javascript
+import EmailReplyParser from "@clearfeed-ai/email-reply-parser";
+
+const parser = new EmailReplyParser();
+
+// Add one or more custom signature regexes
+parser.addSignatureRegexes([
+  /^Sent via CompanyName Mobile$/,
+  /^Thanks,?$/mi,
+  /^Have a great day!?$/mi,
+  /^Posted using MyApp$/
+]);
+
+// Now parse emails with these custom patterns
+const email = parser.read(emailContent);
+```
+
+### Resetting to Default Patterns
+
+If you need to reset the patterns back to the defaults:
+
+``` javascript
+import EmailReplyParser from "@clearfeed-ai/email-reply-parser";
+
+const parser = new EmailReplyParser();
+
+// Add custom patterns
+parser.addQuoteHeaderRegexes([/^Custom pattern$/m]);
+
+// Reset to default quote header patterns
+parser.resetQuoteHeaderRegexes();
+
+// Reset to default signature patterns
+parser.resetSignatureRegexes();
+```
+
+### Method Chaining
+
+All custom regex methods support method chaining for convenience:
+
+``` javascript
+import EmailReplyParser from "@clearfeed-ai/email-reply-parser";
+
+const email = new EmailReplyParser()
+  .addQuoteHeaderRegexes([/^Forwarded by .+$/m])
+  .addSignatureRegexes([/^Sent via MyApp$/])
+  .read(emailContent);
+```
+
+**Note:** Custom patterns are added globally and will affect all subsequent parsing operations. In multi-tenant environments, reset the patterns between tenants or avoid registering tenant-specific patterns globally.
 
 ## Contributing
 

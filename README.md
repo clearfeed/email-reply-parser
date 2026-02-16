@@ -26,7 +26,7 @@ _👋 You use this library and you want to be listed there? [Contact us](https:/
 Install the project using NPM:
 
 ``` javascript
-npm install --save email-reply-parser
+npm install --save @clearfeed-ai/email-reply-parser
 ```
 
 ## RE2 Support
@@ -47,12 +47,116 @@ This library is used at [Crisp](https://crisp.chat/) everyday with around 1 mill
 ## Usage
 
 ``` javascript
-var EmailReplyParser = require("email-reply-parser");
+var EmailReplyParser = require("@clearfeed-ai/email-reply-parser");
 
 var email =  new EmailReplyParser().read(MY_EMAIL_STRING);
 
 console.log(email.getVisibleText());
 ```
+
+### Basic Example
+
+``` javascript
+var EmailReplyParser = require("@clearfeed-ai/email-reply-parser");
+
+var emailContent = `Hi there,
+
+I appreciate your help with this issue.
+
+Thanks!
+
+On Jan 28, 2026, at 10:00 AM, Support <support@example.com> wrote:
+
+> How can I help you?
+> 
+> Best regards,
+> Support Team`;
+
+var parser = new EmailReplyParser();
+var reply = parser.parseReply(emailContent);
+
+console.log(reply);
+// Output: "Hi there,\n\nI appreciate your help with this issue."
+```
+
+## Custom Regex Patterns
+
+You can add custom header and signature regex patterns at runtime to handle specific email formats that aren't covered by the default patterns.
+
+### Adding Custom Quote Header Patterns
+
+Quote headers are patterns that indicate quoted or forwarded content (e.g., "On DATE, NAME wrote:").
+
+``` javascript
+var EmailReplyParser = require("@clearfeed-ai/email-reply-parser");
+
+var parser = new EmailReplyParser();
+
+// Add one or more custom quote header regexes
+parser.addQuoteHeaderRegexes([
+  /^Forwarded by .+ on .+$/m,
+  /^Original message from .+$/m,
+  /^----- Reply from .+ -----$/m
+]);
+
+// Now parse emails with these custom patterns
+var email = parser.read(emailContent);
+```
+
+### Adding Custom Signature Patterns
+
+Signature patterns identify signature lines that should be removed (e.g., "Sent from my iPhone", "Best regards").
+
+``` javascript
+var EmailReplyParser = require("@clearfeed-ai/email-reply-parser");
+
+var parser = new EmailReplyParser();
+
+// Add one or more custom signature regexes
+parser.addSignatureRegexes([
+  /^Sent via CompanyName Mobile$/,
+  /^Thanks,?$/mi,
+  /^Have a great day!?$/mi,
+  /^Posted using MyApp$/
+]);
+
+// Now parse emails with these custom patterns
+var email = parser.read(emailContent);
+```
+
+### Resetting to Default Patterns
+
+If you need to reset the patterns back to the defaults:
+
+``` javascript
+var EmailReplyParser = require("@clearfeed-ai/email-reply-parser");
+
+var parser = new EmailReplyParser();
+
+// Add custom patterns
+parser.addQuoteHeaderRegexes([/^Custom pattern$/m]);
+
+// Reset to default quote header patterns
+parser.resetQuoteHeaderRegexes();
+
+// Reset to default signature patterns
+parser.resetSignatureRegexes();
+```
+
+### Method Chaining
+
+All custom regex methods support method chaining for convenience:
+
+``` javascript
+var EmailReplyParser = require("@clearfeed-ai/email-reply-parser");
+
+var email = new EmailReplyParser()
+  .addQuoteHeaderRegexes([/^Forwarded by .+$/m])
+  .addSignatureRegexes([/^Sent via MyApp$/])
+  .read(emailContent);
+```
+
+**Note:** Custom patterns are added globally and will affect all subsequent parsing operations. In multi-tenant environments, reset the patterns between tenants or avoid registering tenant-specific patterns globally.
 
 ## Contributing
 

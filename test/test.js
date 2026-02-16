@@ -580,3 +580,301 @@ exports.test_email_original_message_french_dash = function(test) {
 
   test.done();
 }
+
+// Tests for custom regex functionality
+
+exports.test_addQuoteHeaderRegexes_single_pattern = function(test) {
+  var emailContent = `Hi team,
+
+This is my reply.
+
+Forwarded by John Smith on Jan 28, 2026
+
+> Original message below
+> Previous content here`;
+
+  // Without custom pattern
+  var parser1 = new EmailReplyParser();
+  var result1 = parser1.parseReply(emailContent);
+
+  test.equal(true, /Forwarded by John Smith/.test(result1));
+  
+  // With custom pattern
+  var parser2 = new EmailReplyParser();
+
+  parser2.addQuoteHeaderRegexes([/^Forwarded by .+ on .+$/m]);
+  
+  var result2 = parser2.parseReply(emailContent);
+
+  test.equal(false, /Forwarded by John Smith/.test(result2));
+  test.equal(false, /Original message below/.test(result2));
+  test.equal(true, /This is my reply/.test(result2));
+  
+  test.done();
+}
+
+exports.test_addQuoteHeaderRegexes_multiple_patterns = function(test) {
+  var emailContent = `My response here
+
+Original message from support@example.com
+
+> Previous email content
+
+----- Reply from jane@example.com -----
+
+> Another quoted section`;
+
+  var parser = new EmailReplyParser();
+
+  parser.addQuoteHeaderRegexes([
+    /^Original message from .+$/m,
+    /^----- Reply from .+ -----$/m
+  ]);
+  
+  var result = parser.parseReply(emailContent);
+
+  test.equal(true, /My response here/.test(result));
+  test.equal(false, /Original message from/.test(result));
+  test.equal(false, /Reply from jane/.test(result));
+  test.equal(false, /Previous email content/.test(result));
+  test.equal(false, /Another quoted section/.test(result));
+  
+  test.done();
+}
+
+exports.test_addSignatureRegexes_single_pattern = function(test) {
+  var emailContent = `Hi there,
+
+Thanks for your help!
+
+Custom Signature Line
+Posted using MyCustomApp
+
+Best regards,
+Jane`;
+
+  // Without custom pattern
+  var parser1 = new EmailReplyParser();
+  var result1 = parser1.parseReply(emailContent);
+
+  test.equal(true, /Custom Signature Line/.test(result1));
+  test.equal(true, /Posted using MyCustomApp/.test(result1));
+  
+  // With custom patterns
+  var parser2 = new EmailReplyParser();
+
+  parser2.addSignatureRegexes([
+    /^Posted using MyCustomApp$/,
+    /^Custom Signature Line$/
+  ]);
+  
+  var result2 = parser2.parseReply(emailContent);
+
+  test.equal(true, /Thanks for your help/.test(result2));
+  test.equal(false, /Custom Signature Line/.test(result2));
+  test.equal(false, /Posted using MyCustomApp/.test(result2));
+  
+  test.done();
+}
+
+exports.test_addSignatureRegexes_multiple_patterns = function(test) {
+  var emailContent = `Hello,
+
+Here is my message.
+
+Thanks,
+TeamName
+
+Have a great day!
+Posted using CompanyApp`;
+
+  var parser = new EmailReplyParser();
+
+  parser.addSignatureRegexes([
+    /^Thanks,?$/mi,
+    /^Have a great day!?$/mi,
+    /^Posted using CompanyApp$/
+  ]);
+  
+  var result = parser.parseReply(emailContent);
+
+  test.equal(true, /Here is my message/.test(result));
+  test.equal(false, /Thanks/.test(result));
+  test.equal(false, /Have a great day/.test(result));
+  test.equal(false, /Posted using CompanyApp/.test(result));
+  
+  test.done();
+}
+
+exports.test_method_chaining_with_custom_regexes = function(test) {
+  var emailContent = `My reply here
+
+CompanyBot Signature
+
+Forwarded by Bot on Jan 28, 2026
+
+> Previous message`;
+
+  var result = new EmailReplyParser()
+    .addQuoteHeaderRegexes([/^Forwarded by Bot on .+$/m])
+    .addSignatureRegexes([/^CompanyBot Signature$/])
+    .parseReply(emailContent);
+
+  test.equal(true, /My reply here/.test(result));
+  test.equal(false, /CompanyBot Signature/.test(result));
+  test.equal(false, /Forwarded by Bot/.test(result));
+  test.equal(false, /Previous message/.test(result));
+  
+  test.done();
+}
+
+exports.test_resetQuoteHeaderRegexes_to_defaults = function(test) {
+  var emailContent = `My message
+
+Custom Header Pattern
+
+> Quoted text`;
+
+  var parser = new EmailReplyParser();
+
+  // Add custom pattern
+  parser.addQuoteHeaderRegexes([/^Custom Header Pattern$/m]);
+  
+  var result1 = parser.parseReply(emailContent);
+
+  test.equal(false, /Custom Header Pattern/.test(result1));
+  
+  // Reset to defaults
+  parser.resetQuoteHeaderRegexes();
+  
+  var result2 = parser.parseReply(emailContent);
+
+  // Custom pattern should now be visible again
+  test.equal(true, /Custom Header Pattern/.test(result2));
+  
+  test.done();
+}
+
+exports.test_resetSignatureRegexes_to_defaults = function(test) {
+  var emailContent = `My message
+
+Custom Signature
+
+Best regards`;
+
+  var parser = new EmailReplyParser();
+
+  // Add custom pattern
+  parser.addSignatureRegexes([/^Custom Signature$/]);
+  
+  var result1 = parser.parseReply(emailContent);
+
+  test.equal(false, /Custom Signature/.test(result1));
+  
+  // Reset to defaults
+  parser.resetSignatureRegexes();
+  
+  var result2 = parser.parseReply(emailContent);
+
+  // Custom pattern should now be visible, but "Best regards" should still be hidden by default
+  test.equal(true, /Custom Signature/.test(result2));
+  test.equal(false, /Best regards/.test(result2));
+  
+  test.done();
+}
+
+exports.test_custom_regexes_work_with_default_patterns = function(test) {
+  var emailContent = `My reply here
+
+Custom App Signature
+
+Sent from my iPhone
+
+On Jan 28, 2026, at 10:00 AM, Support <support@example.com> wrote:
+
+> Original message
+> Some quoted content`;
+
+  var parser = new EmailReplyParser();
+
+  // Add custom signature pattern
+  parser.addSignatureRegexes([/^Custom App Signature$/]);
+  
+  var result = parser.parseReply(emailContent);
+
+  test.equal(true, /My reply here/.test(result));
+  // Custom pattern should be removed
+  test.equal(false, /Custom App Signature/.test(result));
+  // Default signature pattern should still work
+  test.equal(false, /Sent from my iPhone/.test(result));
+  // Default quote header pattern should still work
+  test.equal(false, /On Jan 28, 2026/.test(result));
+  test.equal(false, /Original message/.test(result));
+  
+  test.done();
+}
+
+exports.test_custom_regex_without_capture_group = function(test) {
+  // Test that custom regexes without capture groups don't crash
+  var emailContent = `My message
+
+FORWARDED MESSAGE
+
+> Quoted content`;
+
+  var parser = new EmailReplyParser();
+
+  // Add pattern without capture group
+  parser.addQuoteHeaderRegexes([/^FORWARDED MESSAGE$/m]);
+  
+  var result = parser.parseReply(emailContent);
+
+  test.equal(true, /My message/.test(result));
+  test.equal(false, /FORWARDED MESSAGE/.test(result));
+  test.equal(false, /Quoted content/.test(result));
+  
+  test.done();
+}
+
+exports.test_case_insensitive_custom_signature = function(test) {
+  var emailContent = `Hello,
+
+My response here.
+
+thanKS,
+John`;
+
+  var parser = new EmailReplyParser();
+
+  parser.addSignatureRegexes([/^thanks,?$/mi]);
+  
+  var result = parser.parseReply(emailContent);
+
+  test.equal(true, /My response here/.test(result));
+  test.equal(false, /thanKS/.test(result));
+  
+  test.done();
+}
+
+exports.test_complex_custom_quote_header_pattern = function(test) {
+  var emailContent = `My reply here
+
+[FORWARDED MESSAGE FROM user@example.com]
+
+> Previous content
+> More quoted text`;
+
+  var parser = new EmailReplyParser();
+
+  // Add pattern with square brackets and uppercase
+  parser.addQuoteHeaderRegexes([/^\[FORWARDED MESSAGE FROM .+\]$/m]);
+  
+  var result = parser.parseReply(emailContent);
+
+  test.equal(true, /My reply here/.test(result));
+  test.equal(false, /FORWARDED MESSAGE/.test(result));
+  test.equal(false, /Previous content/.test(result));
+  test.equal(false, /More quoted text/.test(result));
+  
+  test.done();
+}

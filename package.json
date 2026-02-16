@@ -1,8 +1,9 @@
 {
-  "name": "email-reply-parser",
-  "version": "2.0.1",
+  "name": "@clearfeed-ai/email-reply-parser",
+  "version": "2.0.2",
   "description": "Node library for parsing plain text email content. Based on https://github.com/willdurand/EmailReplyParser",
   "main": "lib/emailreplyparser.js",
+  "types": "index.d.ts",
   "homepage": "https://github.com/clearfeed/email-reply-parser",
   "repository": {
     "type": "git",
